@@ -1,0 +1,253 @@
+<style lang="less">
+  .tabs-wrapper {
+    width: 100%;
+    .tabs-header, .tabs-body {
+      width: 100%;
+    }
+    .tabs-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #6666ff;
+      .tabs-header-item {
+        flex: 1;
+        text-align: center;
+        color: #ccccff;
+        padding: 20rpx 0;
+        position: relative;
+        &.active {
+          color: #ffffff;
+          &:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 6rpx;
+            background-color: #ffff99;
+            left: 0;
+            bottom: 0;
+          }
+        }
+      }
+    }
+    .tabs-body {
+      .btn-group {
+        text-align: right;
+        padding: 40rpx;
+        font-size: 0;
+        .btn-add {
+          display: inline-block;
+          background-color: #6666ff;
+          color: #fff;
+          font-size: 32rpx;
+        }
+      }
+      .tabs-body-item {
+        display: none;
+        .list-group {
+          border: 1px solid #e5e5e5;
+          margin-bottom: 40rpx;
+          .list-group-item {
+            margin-top: 0;
+            .swipe-content {
+              border-bottom: 0;
+            }
+            &:first-child {
+              .swipe-content {
+                border-top: 0;
+              }
+            }
+            .txt {
+              font-size: 32rpx;
+            }
+          }
+        }
+        &.active {
+          display: block;
+        }
+      }
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="tabs-wrapper">
+
+      <view class="tabs-header">
+        <repeat for="{{tabsHeaderItem}}" key="index" index="index">
+          <view class="{{tabHeaderActive === index ? 'tabs-header-item active' : 'tabs-header-item'}}" data-index="{{index}}" bindtap="handleHeaderTab">{{item}}</view>
+        </repeat>
+
+      </view>
+
+      <view class="tabs-body">
+        <view class="btn-group">
+          <button class="btn-add" size="mini" @tap="handleShowDialog">添加事件</button>
+        </view>
+        <view class="{{tabHeaderActive === 0 ? 'tabs-body-item active':'tabs-body-item'}}" data-index="0">
+          <!--待办列表 start-->
+          <view class="list-group">
+            <repeat for="{{todoList1}}" key="index" index="index" item="item">
+              <swipeDelete :swipeData="item" @delItem.user="handleDeleteItem" class="list-group-item">
+                <view class="txt swipe-title">{{item.text}}</view>
+              </swipeDelete>
+            </repeat>
+          </view>
+        </view>
+        <!--待办列表 end-->
+        <view class="{{tabHeaderActive === 1 ? 'tabs-body-item active':'tabs-body-item'}}" data-index="1">
+          <wepyCanlendar></wepyCanlendar>
+          <view class="list-group">
+            <repeat for="{{todoList1}}" key="index" index="index" item="item">
+              <swipeDelete :swipeData="item" @delItem.user="handleDeleteItem" class="list-group-item">
+                <view class="txt swipe-title">{{item.text}}</view>
+              </swipeDelete>
+            </repeat>
+          </view>
+        </view>
+
+      </view>
+
+    </view>
+    <!--添加事件弹窗 start-->
+    <mpDialog
+      :showDialogModal="showDialogModal"
+      :btnDefaultText="btnDefaultText"
+      :btnConfirmText="btnConfirmText"
+      wx:if="dialogVisible"
+      class="{{ dialogVisible ? 'show':'' }}"
+    @handleCloseDialog="handleCloseDialog">
+      <view class="header-wrapper" slot="header">添加事件</view>
+      <view class="form-wrapper">
+        <view class="form-group">
+          <view class="input-group">
+            <view class="form-label">标题</view>
+            <view class="form-content">
+              <input class="form-control" auto-focus placeholder="请输入标题"/>
+            </view>
+          </view>
+          <view class="input-group">
+            <view class="form-label">内容</view>
+            <view class="form-content">
+              <textarea class="form-control" auto-height placeholder="请输入标题" />
+            </view>
+          </view>
+        </view>
+      </view>
+    </mpDialog>
+    <!--添加事件弹窗 end-->
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import swipeDelete from 'wepy-swipe-delete'
+  import mpDialog from '../components/common/mpDialog'
+  import { getTodoList } from '../api/todo-list-api'
+  const item = {
+    text: '待办事件。。。',
+    time: '2019-01-12',
+    desc: '待办事件待办事件待办事件待办事件待办事件'
+  }
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'TodoList'
+    }
+    components = {
+      mpDialog,
+      swipeDelete
+    }
+
+    data = {
+      visible: false,
+      currentDate: '2010-01-12',
+      startDate: '2018-01-01',
+      endDate: '2018-02-01',
+      hasIconList: [ '2018-06-01', '2018-06-06', '2018-06-09', '2018-06-10', '2018-06-15' ],
+      tabsHeaderItem: ['列表', '日历'],
+      tabsBodyItem: [],
+      tabHeaderActive: 0, // 控制当前显示盒子
+      todoList1: [
+        {
+          text: '待办事件。。。',
+          time: '2019-01-12',
+          desc: '待办事件待办事件待办事件待办事件待办事件'
+        },
+        {
+          text: '待办事件。。。',
+          time: '2019-01-12',
+          desc: '待办事件待办事件待办事件待办事件待办事件'
+        },
+        {
+          text: '待办事件。。。',
+          time: '2019-01-12',
+          desc: '待办事件待办事件待办事件待办事件待办事件'
+        },
+        {
+          text: '待办事件。。。',
+          time: '2019-01-12',
+          desc: '待办事件待办事件待办事件待办事件待办事件'
+        }
+      ],
+      todoList: Array(20).fill(item),
+      // 弹窗里使用的属性
+      dialogVisible: false,
+      showDialogModal: true,
+      btnDefaultText: '取消',
+      btnConfirmText: '确认'
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+    async getTodoList() {
+      try {
+        const params = {
+        }
+        const res = await getTodoList(params)
+        console.log(res)
+      } catch (e) {
+        console.log(e)
+      }
+    }
+
+    methods = {
+      // 顶部导航切换
+      handleHeaderTab (e) {
+        this.tabHeaderActive = e.currentTarget.dataset.index
+      },
+      // 显示添加事件弹窗
+      handleShowDialog() {
+        this.dialogVisible = true
+      },
+      handleDeleteItem (item) {
+        wx.showModal({
+          title: '提示',
+          content: '确定要删除这条数据吗',
+          success (res) {
+            if (res.confirm) {
+              console.log('确认')
+            } else {
+              console.log('取消')
+            }
+          }
+        })
+        console.log(item)
+      }
+    }
+
+    events = {
+      // 关闭弹窗
+      handleCloseDialog() {
+        this.dialogVisible = false
+      }
+    }
+    onShow() {
+      this.getTodoList()
+    }
+    onLoad() {
+    }
+  }
+</script>

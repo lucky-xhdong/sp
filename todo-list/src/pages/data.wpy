@@ -1,0 +1,100 @@
+<style lang="less">
+  .canvas-wrapper {
+    width: 100%;
+    margin-bottom: 40rpx;
+    &:before {
+      content: attr(data-before);
+      display: block;
+      font-size: 32rpx;
+      color: #666;
+      padding: 20rpx 40rpx;
+      border-top: 2rpx solid #eee;
+      border-bottom: 2rpx solid #eee;
+    }
+    .canvas {
+      width: 100%;
+      height: 560rpx;
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="canvas-wrapper" data-before="待办">
+      <canvas canvas-id="pieCanvas" class="canvas" bindtouchstart="touchHandler"></canvas>
+    </view>
+    <view class="canvas-wrapper" data-before="日历">
+      <canvas canvas-id="lineCanvas" class="canvas" bindtouchstart="touchHandler"></canvas>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  var WxCharts = require('../utils/wxcharts-min.js')
+  let pieChart = null
+  let lineChart = null
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'TodoList'
+    }
+    components = {
+    }
+
+    data = {
+    }
+
+    computed = {
+    }
+
+    methods = {
+    }
+
+    events = {
+    }
+    touchHandler (e) {
+      pieChart.showToolTip(e, {
+        format: function (item, category) {
+          return category + ' ' + item.name + ':' + item.data
+        }
+      })
+      lineChart.showToolTip(e, {
+        format: function (item, category) {
+          return category + ' ' + item.name + ':' + item.data
+        }
+      })
+    }
+    onLoad() {
+      pieChart = new WxCharts({
+        canvasId: 'pieCanvas',
+        type: 'pie',
+        series: [{ name: '一班', data: 50 }, { name: '二班', data: 30 }, { name: '三班', data: 20 }, { name: '四班', data: 18 }, { name: '五班', data: 8 }],
+        width: 320,
+        height: 200,
+        dataLabel: true
+      })
+
+      lineChart = new WxCharts({
+        animation: true,
+        canvasId: 'lineCanvas',
+        type: 'radar',
+        categories: ['1', '2', '3', '4', '5', '6'],
+        series: [{
+          name: '成交量1',
+          data: [90, 110, 125, 95, 87, 122]
+        }, {
+          name: '成交量2',
+          data: [190, 210, 105, 35, 27, 102]
+        }],
+        width: 320,
+        height: 200,
+        extra: {
+          radar: {
+            max: 200 // 雷达数值的最大值
+          }
+        }
+      })
+    }
+  }
+</script>

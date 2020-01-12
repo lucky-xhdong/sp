@@ -1,0 +1,117 @@
+<style lang="less">
+  .wpy-dialog {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 1110;
+    display: none;
+    &.show {
+      display: block;
+    }
+    &.wpy-dialog-modal {
+      &:after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
+        background-color: rgba(0, 0, 0, .4);
+      }
+    }
+    .wpy-dialog-inner {
+      position: absolute;
+      width: 600rpx;
+      min-height: 500rpx;
+      background-color: #fff;
+      border-radius: 16rpx;
+      left: 50%;
+      margin-left: -300rpx;
+      top: 20%;
+      z-index: 1111;
+      .wpy-dialog-header {
+        border-bottom: 1px solid #eee;
+        .header-wrapper {
+          text-align: center;
+          padding: 30rpx 0;
+          font-size: 36rpx;
+        }
+      }
+      .form-wrapper {
+        padding: 20rpx 40rpx;
+        .form-group {
+          .input-group {
+            .form-label {
+              font-size: 32rpx;
+              padding: 20rpx 0;
+            }
+            .form-content {
+              .form-control {
+                width: 100%;
+                font-size: 32rpx;
+              }
+            }
+          }
+        }
+      }
+      .wpy-dialog-footer {
+        text-align: center;
+        padding: 20rpx 0;
+        .btn {
+          margin: 0 20rpx;
+        }
+      }
+    }
+  }
+</style>
+
+<template>
+  <view class="wpy-dialog wpy-dialog-modal">
+    <view class="wpy-dialog-inner">
+      <view class="wpy-dialog-header">
+        <slot name="header"></slot>
+      </view>
+      <view class="wpy-dialog-content">
+        <slot></slot>
+      </view>
+      <view class="wpy-dialog-footer">
+        <button class="btn btn-default" size="mini" type="default" @tap="handleClose">{{btnDefaultText}}</button>
+        <button class="btn btn-confirm" size="mini" type="primary">{{btnConfirmText}}</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+
+  export default class Dialog extends wepy.component {
+    components = {
+    }
+
+    props = {
+      showDialogModal: {
+        type: Boolean
+      },
+      btnDefaultText: {
+        type: String
+      },
+      btnConfirmText: {
+        type: String
+      }
+    }
+
+    data = {}
+    methods = {
+      handleClose() {
+        this.$emit('handleCloseDialog')
+      }
+    }
+
+    events = {}
+    onLoad() {
+    }
+  }
+</script>

@@ -1,0 +1,348 @@
+<style lang="less">
+  .flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .clearfix:after {
+    content: '';
+    height: 0;
+    line-height: 0;
+    display: block;
+    visibility: hidden;
+    clear: both;
+  }
+
+  .calendar-bg {
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    transition: 0.3s;
+  }
+
+  .calendar-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 101;
+    background-color: white;
+    .confirm {
+      position: absolute;
+      bottom: 30rpx;
+      right: 50rpx;
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      width: 100%;
+      align-items: center;
+      font-size: 28rpx;
+      // border-radius: 50%;
+    }
+    .confirm_btn {
+      background-color: #efefef;
+      color: #32B650;
+      padding: 0 20rpx;
+      line-height: 60rpx;
+      box-shadow: 0 1px 2px rgba(150, 150, 150, 0.3);
+      border-radius: 30rpx;
+      z-index: 999
+    }
+    .confirm_btn_active {
+      background-color: #32B650;
+      color: #FFF;
+    }
+  }
+
+  .calendar-header {
+    width: 100%;
+    box-sizing: border-box;
+    height: 130rpx;
+    padding: 30rpx 30rpx;
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: column;
+    font-size: 24rpx;
+    > view:first-child {
+      color: lightgray;
+    }
+  }
+
+  .pick-view {
+    width: 100%;
+    height: 100rpx;
+    position: relative;
+    font-size: 40rpx;
+    font-weight: 600;
+    .pick-img {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      > view {
+        width: 60rpx;
+        height: 100%;
+        position: relative;
+        > image {
+          width: 30rpx;
+          height: 30rpx;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
+      }
+    }
+  }
+
+  picker {
+    width: 130rpx;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .calendar-content {
+    width: 100%;
+    // padding: 10rpx 50rpx 30rpx 50rpx;
+    // background-color: lightyellow;
+    background-color: white;
+    box-sizing: border-box;
+    font-size: 24rpx;
+    .week {
+      margin: 40rpx 0;
+      > view {
+        flex: 1;
+        color: gray;
+      }
+    }
+    .day {
+      width: 100%;
+      margin-bottom: 40rpx;
+      font-size: 36rpx;
+      > view {
+        position: relative;
+        float: left;
+        width: calc(100% / 7);
+        height: 60rpx;
+        padding: 20rpx;
+        box-sizing: border-box;
+
+        margin-bottom: 20rpx;
+      }
+      .day-item {
+        z-index: 200;
+      }
+      .day-item-active {
+        color: #FFF;
+      }
+      .not-view-month {
+        color: #FFF;
+      }
+      .view-month-future {
+        color: #efefef;
+      }
+      .round {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: black;
+        width: 72rpx;
+        height: 72rpx;
+        border-radius: 50%;
+        z-index: 102;
+      }
+      .restime {
+        color: white;
+      }
+    }
+  }
+</style>
+
+<template>
+  <div class="calendar-wrapper" id="calendar">
+    <!-- 年份 月份 -->
+    <div class="cw-header">
+      <!--<a href="javascript:;" class="arrow arrow-left" @click="pickPrev(currentYear,currentMonth)"><</a>-->
+      <span class="txt-date">{{ currentYear }}年{{ currentMonth }}月</span>
+      <!--<a href="javascript:;" class="arrow arrow-right" @click="pickNext(currentYear,currentMonth)">></a>-->
+    </div>
+    <!-- 星期 -->
+    <div class="weekday">
+      <ul>
+        <li><span class="txt">星期一</span></li>
+        <li><span class="txt">星期二</span></li>
+        <li><span class="txt">星期三</span></li>
+        <li><span class="txt">星期四</span></li>
+        <li><span class="txt">星期五</span></li>
+        <li><span class="txt">星期六</span></li>
+        <li><span class="txt">星期日</span></li>
+      </ul>
+    </div>
+    <!-- 日期 -->
+    <div class="month">
+      <ul>
+        <!-- v-for循环 每一次循环用<li>标签创建一天 -->
+        <!--<li v-for="(day, index) in days" :key="index">-->
+          <!--&lt;!&ndash;如果不是本月  改变类名加灰色 start&ndash;&gt;-->
+          <!--<div v-if="day.day.getMonth()+1 != currentMonth" class="other-month">-->
+            <!--<p class="txt-day">{{ day.day.getDate() }}</p>-->
+          <!--</div>-->
+          <!--&lt;!&ndash;如果不是本月  改变类名加灰色 end&ndash;&gt;-->
+          <!--&lt;!&ndash;如果是本月  还需要判断是不是这一天 start&ndash;&gt;-->
+          <!--<div v-else class="current-month">-->
+            <!--&lt;!&ndash;今天 同年同月同日 start&ndash;&gt;-->
+            <!--<div class="day-wrapper active" v-if="-->
+                  <!--day.day.getFullYear() == new Date().getFullYear() &&-->
+                  <!--day.day.getMonth() == new Date().getMonth() &&-->
+                  <!--day.day.getDate() == new Date().getDate()">-->
+              <!--<p class="txt-day">{{ day.day.getDate() }}</p>-->
+              <!--<a @click="jumpToDayViewIframe(day.date)" v-if="day.shift && day.shift.length > 0">-->
+                <!--<el-button type="default" size="mini" class="btn btn-view" icon="el-icon-view">查看</el-button>-->
+              <!--</a>-->
+              <!--<span v-if="userEmail === 'xiaxj@huoli.com' || userEmail === 'humr@huoli.com'" >-->
+                <!--<el-button type="primary" size="mini" class="btn btn-add" v-if="day.shift && day.shift.length > 0" icon="el-icon-edit" @click="showAddForm(day.date)">新增</el-button>-->
+                <!--</span>-->
+              <!--<div class="txt-shift-info" v-for="(shift, index) in day.shift" :key="index" v-if="day.shift.length > 0">-->
+                <!--<el-popover-->
+                  <!--placement="bottom"-->
+                  <!--:title=shift.shiftName-->
+                  <!--width="360"-->
+                  <!--popper-class="el-popover-shift"-->
+                  <!--:open-delay=openDelay-->
+                  <!--trigger="click">-->
+                  <!--<span v-for="(user, index1) in shift.userInfoVOList" :key="index1" class="txt-user">{{index1 + 1}}.{{user.csaOrgName}}&nbsp;/&nbsp; {{user.userOrgRole | userInfoFilter}}&nbsp;/&nbsp;{{user.trueName}}&nbsp;/&nbsp;{{user.agentNo}}</span>-->
+                  <!--<el-button slot="reference">-->
+                    <!--<span class="txt-shift">{{shift.shiftName}}&#45;&#45;{{shift.userNameList.length}}人</span>-->
+                    <!--<a href="javascript:;" class="btn btn-edit" v-if="userEmail === 'xiaxj@huoli.com' || userEmail === 'humr@huoli.com'"  @click="showEditForm(day.date, shift.shiftId, shift.shiftName, shift.userIds, shift.resultStatus)">编辑</a>-->
+                  <!--</el-button>-->
+                <!--</el-popover>-->
+              <!--</div>-->
+            <!--</div>-->
+            <!--&lt;!&ndash;今天 同年同月同日 end&ndash;&gt;-->
+            <!--<div class="day-wrapper" v-else>-->
+              <!--<p class="txt-day">{{ day.day.getDate() }}</p>-->
+              <!--<a @click="jumpToDayViewIframe(day.date)" v-if="day.shift && day.shift.length > 0">-->
+                <!--<el-button type="default" size="mini" class="btn btn-view" icon="el-icon-view">查看</el-button>-->
+              <!--</a>-->
+              <!--<span v-if="userEmail === 'xiaxj@huoli.com' || userEmail === 'humr@huoli.com'" >-->
+                <!--<el-button type="primary" size="mini" class="btn btn-add" v-if="day.shift && day.shift.length > 0" icon="el-icon-edit" @click="showAddForm(day.date)">新增</el-button>-->
+                <!--</span>-->
+              <!--<div class="txt-shift-info" v-for="(shift, index) in day.shift" :key="index" v-if="day.shift.length > 0">-->
+                <!--<el-popover-->
+                  <!--placement="bottom"-->
+                  <!--:title=shift.shiftName-->
+                  <!--width="360"-->
+                  <!--popper-class="el-popover-shift"-->
+                  <!--:open-delay=openDelay-->
+                  <!--trigger="click">-->
+                  <!--<span v-for="(user, index1) in shift.userInfoVOList" :key="index1" class="txt-user">{{index1 + 1}}.{{user.csaOrgName}}&nbsp;/&nbsp; {{user.userOrgRole | userInfoFilter}}&nbsp;/&nbsp;{{user.trueName}}&nbsp;/&nbsp;{{user.agentNo}}</span>-->
+                  <!--<el-button slot="reference" v-if="shift.shiftName">-->
+                    <!--<span class="txt-shift">{{shift.shiftName}}&#45;&#45;{{shift.userNameList.length}}人</span>-->
+                    <!--<a href="javascript:;" class="btn btn-edit" v-if="userEmail === 'xiaxj@huoli.com' || userEmail === 'humr@huoli.com'"  @click="showEditForm(day.date, shift.shiftId, shift.shiftName, shift.userIds, shift.resultStatus)">编辑</a>-->
+                  <!--</el-button>-->
+                <!--</el-popover>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+          <!--&lt;!&ndash;如果是本月  还需要判断是不是这一天 end&ndash;&gt;-->
+        <!--</li>-->
+      </ul>
+    </div>
+  </div>
+
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { formatDateByTimestamp } from '../../utils/index'
+  export default class Calendar extends wepy.component {
+    data = {
+      currentDay: 1,
+      currentMonth: 1,
+      currentYear: 1970,
+      currentWeekDay: 0,
+      allDaysOfCurrentMonth: [], // 当前月份的所有日期
+      days: []
+    }
+    // 格式化日期 返回类似 2016-01-02 格式的字符串
+    formatDate(year, month, day) {
+      const y = year
+      let m = month
+      if (m < 10) m = '0' + m
+      let d = day
+      if (d < 10) d = '0' + d
+      return y + '-' + m + '-' + d
+    }
+
+    /**
+     * 初始化日历
+     */
+    initCalendar() {
+      debugger
+      // 日历渲染
+      let date = ''
+      let totalDays = 0
+      const now = new Date()
+      date = new Date(this.formatDate(now.getFullYear(), now.getMonth() + 1, 1))
+      this.currentDay = date.getDate()
+      this.currentYear = date.getFullYear() // 当前年份
+      this.currentMonth = date.getMonth() + 1 // 当前月份
+      this.currentWeekDay = date.getDay() // 1...6,0当天是星期几
+      const sDate = this.formatDate(this.currentYear, this.currentMonth, this.currentDay)
+      this.days.length = 0
+
+      // currentWeekDay为0表示是星期天
+      if (this.currentWeekDay === 0) {
+        this.currentWeekDay = 7
+        totalDays = 42
+      } else {
+        totalDays = 35
+      }
+      // 今天是周日，放在第一行第7个位置，前面6个
+      // 初始化本周
+      for (let i = this.currentWeekDay - 1; i >= 0; i--) {
+        const d = new Date(sDate)
+        d.setDate(d.getDate() - i)
+
+        const oDay = {}
+        oDay.day = d
+        oDay.date = formatDateByTimestamp(d * 1, 'yyyy-MM-dd')
+
+        this.days.push(oDay) // 将日期放入data 中的days数组 供页面渲染使用
+      }
+      // 初始化其他周
+      for (let i = 1; i <= totalDays - this.currentWeekDay; i++) {
+        const d = new Date(sDate)
+        d.setDate(d.getDate() + i)
+
+        const oDay = {}
+        oDay.day = d
+        oDay.date = formatDateByTimestamp(d * 1, 'yyyy-MM-dd')
+
+        this.days.push(oDay)
+      }
+    }
+    methods = {
+    }
+    onShow () {
+      this.initCalendar()
+    }
+    onLoad () {
+    }
+  }
+</script>

@@ -1,0 +1,53 @@
+<style lang="less">
+  .container {
+    padding: 40rpx 0;
+    .user-info {
+      text-align: center;
+      .avatar, .user-name {
+        display: block;
+      }
+      .avatar {
+        width: 120rpx;
+        height: 120rpx;
+        margin: 0 auto;
+      }
+      .user-name {
+        margin: 20rpx 0;
+        font-size: 32rpx;
+        color: #666;
+      }
+    }
+  }
+</style>
+<template>
+  <view class="container">
+    <view class="user-info">
+      <image class="avatar"></image>
+      <text class="user-name">xhdong</text>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: 'TodoList'
+    }
+    components = {
+    }
+
+    data = {
+    }
+
+    computed = {
+    }
+    methods = {
+    }
+
+    events = {
+    }
+    onLoad() {
+    }
+  }
+</script>
